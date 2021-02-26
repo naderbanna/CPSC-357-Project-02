@@ -19,35 +19,45 @@ var passphrase: String = "_helpme"
 class Program{
     init(){
         
-        let str = "Hellojeff Jeff"
+        //testing translate function here
+        
+        //let str = "hello"
+        let str = "mustard"
+        //let str = "a"
+        //let str = "Sensai!! Bob Monkey 123 Six"
         var strShift = ""
         var shift = str.count
         
-        print("newPassword: \(str)")
+        print("input: \(str)")
         for letter in str{
             strShift += String(translate(l: letter, trans: shift))
         }
         
-        print(strShift)
+        print("translated: \(strShift)")
         
+        //shift backwards
         let strE = strShift
-        shift = -strE.count
+        shift = -1*(strE.count)
         strShift = ""
-        
         
         for letter in strE{
             strShift += String(translate(l: letter, trans: shift))
         }
         
-        print(strShift)
+        print("un-translate: \(strShift)")
+        
+        
+        
+        
+        
         
         var reply = ""
         var keepRunning = false
         
+        //change this functionality. passphrase is only used when encrypting/decrypting password
         reply = Ask.AskQuestion(questionText: "Enter your passphrase: ", acceptableReplies: [])
         if reply == passphrase{
             read()
-            
         }else{
             print("Incorrect passphrase. Program will exit")
             keepRunning = false
@@ -59,12 +69,6 @@ class Program{
             // if not, change keeprunning = false
             //application will end
             //write(dict: masterPasswordList)
-            
-//            let testDict = masterPasswordList
-
-//            for (key, value) in testDict{
-//                print("Key: \(key) \nValue: \(value)")
-//            }
            
             print("Welcome to your Password Manager. Here are your 5 options")
             
@@ -145,12 +149,13 @@ class Program{
                     print("Key: \(key)")
             }
             
-           
-
         }
     }
 }
 }
+
+let p = Program()
+
 
 class Ask{
     static func AskQuestion(questionText output: String, acceptableReplies inputArr: [String], caseSensative: Bool = false) -> String{
@@ -173,8 +178,6 @@ class Ask{
         }
     }
 }
-
-let p = Program()
 
 
 func write(dict input: [String: String]){
@@ -205,28 +208,37 @@ func read(){
         if let object = json{
             masterPasswordList = object
         }
-        
-
     }catch{
     //print(error)
         print("No data found")
     }
 }
 
+//the original translate function
+
+//func translate(l: Character, trans: Int) -> Character{
+//    if let ascii = l.asciiValue{
+//        var outputInt = (ascii)
+//        if ascii >= 98 && ascii <= 122{
+//            outputInt = ((ascii-97+UInt8(trans))%26)+97//something to do with UInt8 and casting
+//        }else if (ascii >= 65 && ascii <= 90){
+//            outputInt = ((ascii-65+UInt8(trans))%26)+65
+//        }
+//        return Character(UnicodeScalar(outputInt))
+//    }
+//    return Character("")
+//}
+
 func translate(l: Character, trans: Int) -> Character{
     if let ascii = l.asciiValue{
-        var outputInt = Int(ascii)
+        var outputInt = Int(ascii)          //casting ascii to Int
         if ascii >= 98 && ascii <= 122{
-            // a = 97
-            // 97 - 97 = 0
-            // 0 + 27 = 27
-            // 27 % 26 = 1
-            // 98 = b
-            outputInt = ((Int(ascii)-97+trans)%26)+97//something to do with UInt8 and casting
+            outputInt = ((Int(ascii)-97+trans)%26)+97   //removed UInt8 cast on trans, outputInt now should be signed Int
         }else if (ascii >= 65 && ascii <= 90){
             outputInt = ((Int(ascii)-65+trans)%26)+65
         }
-        return Character(UnicodeScalar(outputInt)!)
+        return Character(UnicodeScalar(outputInt)!)     //did not understand this, but after the above changes, xcode
+                                                        //made me unwrap UnicodeScalar
     }
     return Character("")
 }
