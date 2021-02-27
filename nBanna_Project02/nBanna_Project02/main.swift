@@ -10,96 +10,48 @@ import Foundation
 
 var masterPasswordList = [String: String]()
 
-//do not have this hardcoded
-var passphrase: String = "_helpme"
-
-//masterPasswordList = ["Google": "strongPassword"+passphrase, "Snapchat": "543EasteWalnut"+passphrase]
-
 
 class Program{
     init(){
         
-        //testing translate function here
-        
-        //let str = "hello"
-        let str = "mustard"
-        //let str = "a"
-        //let str = "Sensai!! Bob Monkey 123 Six"
-        var strShift = ""
-        var shift = str.count
-        
-        print("input: \(str)")
-        for letter in str{
-            strShift += String(translate(l: letter, trans: shift))
-        }
-        
-        print("translated: \(strShift)")
-        
-        //shift backwards
-        let strE = strShift
-        shift = -1*(strE.count)
-        strShift = ""
-        
-        for letter in strE{
-            strShift += String(translate(l: letter, trans: shift))
-        }
-        
-        print("un-translate: \(strShift)")
-        
-        
-        
-        
-        
+        read()
         
         var reply = ""
-        var keepRunning = false
-        
-        //change this functionality. passphrase is only used when encrypting/decrypting password
-        reply = Ask.AskQuestion(questionText: "Enter your passphrase: ", acceptableReplies: [])
-        if reply == passphrase{
-            read()
-        }else{
-            print("Incorrect passphrase. Program will exit")
-            keepRunning = false
-        }
+        var keepRunning = true
         
         while keepRunning{
-            //ask a question
-            // act on that question
-            // if not, change keeprunning = false
-            //application will end
-            //write(dict: masterPasswordList)
-           
+            print("")
             print("Welcome to your Password Manager. Here are your 5 options")
             
             print("1. View all password names \n2. View a single password \n3. Add a single password \n4. Delete a password \n5. Exit Program \n______________________\n")
+            
             reply = Ask.AskQuestion(questionText: "View all passwords? ('yes' or 'no')", acceptableReplies: ["no", "yes"])
             if reply == "no"{
+                
                 reply = Ask.AskQuestion(questionText: "View a single password? ('yes' or 'no')", acceptableReplies: ["no", "yes"])
                 if reply == "no"{
+                    
                     reply = Ask.AskQuestion(questionText: "Add a single password? ('yes' or 'no')", acceptableReplies: ["no", "yes"])
                     if reply == "no"{
+                        
                         reply = Ask.AskQuestion(questionText: "Delete a password? ('yes' or 'no')", acceptableReplies: ["no", "yes"])
                         if reply == "no"{
+                            
                             reply = Ask.AskQuestion(questionText: "Exit Program? ('yes' or 'no')", acceptableReplies: ["no", "yes"])
                             if reply == "yes"{
                                 //exit program
+                                write(dict: masterPasswordList)
                                 keepRunning = false;
                             }
 
                         }else if reply == "yes"{
                             //delete password
-                            
-                            
+                            reply = Ask.AskQuestion(questionText: "Enter the password name (key) to delete: ", acceptableReplies: [])
+                            masterPasswordList.removeValue(forKey: reply)
+                            write(dict: masterPasswordList)
                         }
                     }else if reply == "yes"{
-//                        print("Enter the password name (key): ")
-//                        let userKey = readLine()
-//                        print("Enter the password: ")
-//                        let userPassword = readLine();
-//                        print("Enter your passphrase")
-//                        let userPPH = readLine()
-                        
+                        //enter new password
                         reply = Ask.AskQuestion(questionText: "Enter the password name (key): ", acceptableReplies: [])
                         let userKey = reply
                         reply = Ask.AskQuestion(questionText: "Enter the password: ", acceptableReplies: [])
@@ -107,48 +59,66 @@ class Program{
                         reply = Ask.AskQuestion(questionText: "Enter your passphrase: ", acceptableReplies: [])
                         let userPPH = reply
                         
-                        
                         //append passphrase, reverse, pass to Caesar Cipher function
                         let newPassword: String = userPassword+userPPH
-                        
                         let str = newPassword.reversed()
                         var strShift = ""
                         let shift = str.count
                         
-                        print("newPassword: \(str)")
                         for letter in str{
                             strShift += String(translate(l: letter, trans: shift))
                         }
-                        
-                        print(strShift)
-                        
-                        masterPasswordList[userKey] = newPassword
+                                                
+                        masterPasswordList[userKey] = strShift
                         write(dict: masterPasswordList)
                     }
                 }else if reply == "yes"{
                     //View a single password
                     reply = Ask.AskQuestion(questionText: "Which password would you like to view? Enter the key: ", acceptableReplies: [])
-                    
+                
                     if masterPasswordList.keys.contains(reply){
-                        print("Please enter the passphrase: ")
-                        let userPPH = readLine()
-                        //need to change to descramble password then display
-                        if userPPH == passphrase{
-                            
-                            let tempPass = masterPasswordList[reply]!.dropLast(passphrase.count)
-                            print(tempPass)
-                        }else{
-                            print("You entered the wrong passphrase")
+                        let tempPass = masterPasswordList[reply]!
+                        
+                        let shift = 26-tempPass.count
+                        var strShift = ""
+                        
+                        for letter in tempPass{
+                            strShift += String(translate(l: letter, trans: shift))
                         }
-                    }
+                        
+                        let usrPass = String(strShift.reversed())
+                        
+                        reply = Ask.AskQuestion(questionText: "Enter your passphrase to display: ", acceptableReplies: [])
+                    
+                        print("")
+                        if usrPass.contains(reply){
+                            print("Password: \(usrPass.dropLast(reply.count))")
+                        }
+                    
                 }
-
+            }
             }else if reply == "yes"{
                 //View all Passwords
+                reply = Ask.AskQuestion(questionText: "Enter your passphrase to display all passwords: ", acceptableReplies: [])
+
+                print("")
                 for (key, _) in masterPasswordList{
-                    print("Key: \(key)")
+                    let tempPass = masterPasswordList[key]!
+                    
+                    let shift = 26-tempPass.count
+                    var strShift = ""
+                    
+                    for letter in tempPass{
+                        strShift += String(translate(l: letter, trans: shift))
+                    }
+                    
+                    let usrPass = String(strShift.reversed())
+                    
+                
+                    if usrPass.contains(reply){
+                        print("\(key) Password: \(usrPass.dropLast(reply.count))")
+                    }
             }
-            
         }
     }
 }
@@ -167,9 +137,6 @@ class Ask{
             print("Invalid input")
             return AskQuestion(questionText: output, acceptableReplies: inputArr)
         }
-        //they typed in a valid answer
-        // verify that the response is acceptable
-        // or that we dont care what the response is
         if(inputArr.contains(response) || inputArr.isEmpty){
             return response
         }else{
@@ -186,7 +153,7 @@ func write(dict input: [String: String]){
         let fileURL = try FileManager.default
             //change the directory to pick where it goes
             .url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-            .appendingPathComponent("passwords_Proj02.json")
+            .appendingPathComponent("passwords_nBanna_Proj02.json")
 
         try JSONSerialization.data(withJSONObject: input)
             .write(to: fileURL)
@@ -201,7 +168,7 @@ func read(){
     let fileURL = try FileManager.default
         //change the directory to pick where it goes
         .url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-        .appendingPathComponent("passwords_Proj02.json")
+        .appendingPathComponent("passwords_nBanna_Proj02.json")
         //print(fileURL)
         let data = try Data(contentsOf: fileURL)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: String]
@@ -214,31 +181,16 @@ func read(){
     }
 }
 
-//the original translate function
-
-//func translate(l: Character, trans: Int) -> Character{
-//    if let ascii = l.asciiValue{
-//        var outputInt = (ascii)
-//        if ascii >= 98 && ascii <= 122{
-//            outputInt = ((ascii-97+UInt8(trans))%26)+97//something to do with UInt8 and casting
-//        }else if (ascii >= 65 && ascii <= 90){
-//            outputInt = ((ascii-65+UInt8(trans))%26)+65
-//        }
-//        return Character(UnicodeScalar(outputInt))
-//    }
-//    return Character("")
-//}
-
 func translate(l: Character, trans: Int) -> Character{
     if let ascii = l.asciiValue{
-        var outputInt = Int(ascii)          //casting ascii to Int
-        if ascii >= 98 && ascii <= 122{
-            outputInt = ((Int(ascii)-97+trans)%26)+97   //removed UInt8 cast on trans, outputInt now should be signed Int
+        var outputInt = Int(ascii)
+        if ascii >= 97 && ascii <= 122{
+            outputInt = abs((Int(ascii)-97+trans)%26)+97
         }else if (ascii >= 65 && ascii <= 90){
-            outputInt = ((Int(ascii)-65+trans)%26)+65
+            outputInt = abs((Int(ascii)-65+trans)%26)+65
         }
-        return Character(UnicodeScalar(outputInt)!)     //did not understand this, but after the above changes, xcode
-                                                        //made me unwrap UnicodeScalar
+        return Character(UnicodeScalar(outputInt)!)
     }
     return Character("")
 }
+
